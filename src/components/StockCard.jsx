@@ -49,7 +49,7 @@ export function StockCard({ stock, isExpanded, onClick }) {
 
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-white text-2xl">${stock.price.toFixed(2)}</div>
+            <div className="text-white text-2xl">{stock.price.toFixed(2)}</div>
             <div className={`text-sm ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
               {isPositive ? '+' : ''}{stock.change.toFixed(2)} today
             </div>
@@ -91,7 +91,7 @@ export function StockCard({ stock, isExpanded, onClick }) {
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">EPS</span>
-                    <span className="text-white">${stock.eps}</span>
+                    <span className="text-white">{stock.eps}</span>
                   </div>
                 </div>
               </div>
@@ -106,15 +106,15 @@ export function StockCard({ stock, isExpanded, onClick }) {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">Open</span>
-                    <span className="text-white">${stock.open.toFixed(2)}</span>
+                    <span className="text-white">{stock.open.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">High</span>
-                    <span className="text-emerald-400">${stock.high.toFixed(2)}</span>
+                    <span className="text-emerald-400">{stock.high.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">Low</span>
-                    <span className="text-red-400">${stock.low.toFixed(2)}</span>
+                    <span className="text-red-400">{stock.low.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -129,15 +129,15 @@ export function StockCard({ stock, isExpanded, onClick }) {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">Prev Close</span>
-                    <span className="text-white">${stock.previousClose.toFixed(2)}</span>
+                    <span className="text-white">{stock.previousClose.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">52W High</span>
-                    <span className="text-emerald-400">${stock.yearHigh.toFixed(2)}</span>
+                    <span className="text-emerald-400">{stock.yearHigh.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                     <span className="text-slate-400 text-sm">52W Low</span>
-                    <span className="text-red-400">${stock.yearLow.toFixed(2)}</span>
+                    <span className="text-red-400">{stock.yearLow.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -150,19 +150,21 @@ export function StockCard({ stock, isExpanded, onClick }) {
                 </div>
                 
                 <div className="space-y-3">
-                  <div className="p-4 bg-slate-800/50 rounded-lg">
-                    <div className="text-slate-400 text-sm mb-2">Today's Change</div>
-                    <div className={`text-2xl ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                    <span className="text-slate-400 text-sm">Today's Change</span>
+                    <span className={`${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                       {isPositive ? '+' : ''}{stock.change.toFixed(2)}
-                    </div>
-                    <div className={`text-sm mt-1 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {isPositive ? '+' : ''}{stock.changePercent}%
-                    </div>
+                    </span>
                   </div>
-                  
-                  <div className="p-4 bg-slate-800/50 rounded-lg">
-                    <div className="text-slate-400 text-sm mb-2">Volume</div>
-                    <div className="text-cyan-400 text-xl">{stock.volume}</div>
+                  <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                    <span className="text-slate-400 text-sm">Change %</span>
+                    <span className={`${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {isPositive ? '+' : ''}{stock.changePercent}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                    <span className="text-slate-400 text-sm">Volume</span>
+                    <span className="text-cyan-400">{stock.volume}</span>
                   </div>
                 </div>
               </div>
