@@ -1,0 +1,134 @@
+{
+  "_id": {
+    "$oid": "693eab27e1047deb369cff63"
+  },
+  "symbol": "NIFTY",
+  "Y0DA_data": {
+    "D1": "25994.78",
+    "D2": "25068.87",
+    "D3": "24776.43",
+    "D4": "24673.38",
+    "D5": "23503.09"
+  },
+  "base_data": {
+    "LWAVG": 26250.41,
+    "HOIAVG": 26246.89,
+    "MIN": 25032.79,
+    "MAX": 26399.92,
+    "BASE": 25643.7,
+    "DA_CURRENT": 25956.7,
+    "DA_NEXT": 26030.04
+  },
+  "cash_data": {
+    "UP": 5,
+    "DOWN": 3,
+    "MEDIAN": 25844.99,
+    "CP": 26046.95,
+    "DA": 25990.67
+  },
+  "ce_summary": {
+    "MIN": {
+      "PRICE": 25700,
+      "OI": 6930,
+      "GA": 497.83,
+      "CP": 506.25,
+      "MAXA": 368.86,
+      "instrument_key": "NSE_FO|65559",
+      "atp": null
+    },
+    "MAX": {
+      "PRICE": 26400,
+      "OI": 42058,
+      "GA": 169.72,
+      "CP": 90.95,
+      "MAXA": 67.55,
+      "instrument_key": "NSE_FO|65691",
+      "atp": null
+    },
+    "BASE": {
+      "PRICE": 25950,
+      "OI": 2072,
+      "GA": 333.41,
+      "CP": 316.4,
+      "MAXA": 227.18,
+      "instrument_key": "NSE_FO|65600",
+      "atp": null
+    },
+    "HOI": {
+      "PRICE": 26000,
+      "OI": 89594.33,
+      "GA": 368.72,
+      "CP": 282.75,
+      "MAXA": 228.49,
+      "instrument_key": "NSE_FO|71399",
+      "atp": null
+    }
+  },
+  "expiry_date": "2025-12-30",
+  "future_data": {
+    "FPL": -31630.36,
+    "HLB": 25465.88,
+    "CE_CNT": 201,
+    "PE_CNT": 93,
+    "CURR_CEPL": -614029.18,
+    "NEXT_CEPL": -36020.71,
+    "CURR_PEPL": -958844.87,
+    "NEXT_PEPL": -38548.2,
+    "OIF": 0.21,
+    "OIO": 1.62,
+    "OIT": 1.45,
+    "CLOTS": 446,
+    "FLOTS": 268,
+    "NLOTS": 365,
+    "CE1": 27000,
+    "CE2": 26000,
+    "PE1": 26000,
+    "PE2": 25000,
+    "AVG": 26174.2,
+    "STATUS": "NONE",
+    "RF": 1314.26,
+    "TRF": 1358.04,
+    "CASH_AVG": 25771.62
+  },
+  "instrument_key": "NSE_INDEX|Nifty 50",
+  "future_instrument_key": "NSE_FO|49543",
+  "pe_summary": {
+    "MIN": {
+      "PRICE": 26400,
+      "OI": 11418,
+      "GA": 358.89,
+      "CP": 342.15,
+      "MAXA": 304.86,
+      "instrument_key": "NSE_FO|65692",
+      "atp": null
+    },
+    "MAX": {
+      "PRICE": 25700,
+      "OI": 28939,
+      "GA": 139.25,
+      "CP": 59.95,
+      "MAXA": 131.54,
+      "instrument_key": "NSE_FO|65560",
+      "atp": null
+    },
+    "BASE": {
+      "PRICE": 25950,
+      "OI": 4140,
+      "GA": 209.9,
+      "CP": 118.4,
+      "MAXA": 133.21,
+      "instrument_key": "NSE_FO|65620",
+      "atp": null
+    },
+    "HOI": {
+      "PRICE": 26000,
+      "OI": 96863.67,
+      "GA": 281.28,
+      "CP": 135.25,
+      "MAXA": 153.09,
+      "instrument_key": "NSE_FO|71403",
+      "atp": null
+    }
+  },
+  "trade_date": "2025-12-12"
+}

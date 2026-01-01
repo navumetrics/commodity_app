@@ -1,5 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StockCard } from './components/StockCard';
+import { IndexCard } from './components/IndexCard';
+import { TestIndexCard } from './components/TestIndexCard';
+import { SymbolCard } from './components/SymbolCard';
+import { Wifi, WifiOff } from 'lucide-react';
+import marketDataService from './services/marketDataService';
+
+console.log('🚀 [App.jsx] Module loaded!');
 
 const mockStocks = [
   {
@@ -150,6 +157,35 @@ const mockStocks = [
 
 export default function App() {
   const [expandedId, setExpandedId] = useState(null);
+  const [activeTab, setActiveTab] = useState('nifty'); // 'stocks', 'indices', 'test', 'nifty', 'banknifty'
+  const [isConnected, setIsConnected] = useState(false);
+  const [symbolsData, setSymbolsData] = useState({}); // { NIFTY: {...}, BANKNIFTY: {...} }
+
+  // Connect to WebSocket on mount
+  useEffect(() => {
+    console.log('[App] Connecting to WebSocket...');
+    marketDataService.connect();
+
+    const unsubscribeData = marketDataService.subscribe((data) => {
+      console.log('[App] Received data update:', {
+        symbols: Object.keys(data || {}),
+        timestamp: new Date().toISOString()
+      });
+      setSymbolsData(data || {});
+    });
+
+    const unsubscribeConnection = marketDataService.onConnectionChange((connected) => {
+      console.log('[App] Connection status changed:', connected);
+      setIsConnected(connected);
+    });
+
+    return () => {
+      console.log('[App] Cleaning up WebSocket...');
+      unsubscribeData();
+      unsubscribeConnection();
+      marketDataService.disconnect();
+    };
+  }, []);
 
   const handleCardClick = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -159,19 +195,152 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-cyan-400 mb-2">NSE Commodity Market Dashboard</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-cyan-400 mb-2">NSE Commodity Market Dashboard</h1>
+            
+            {/* Connection Status Indicator */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
+              isConnected 
+                ? 'bg-green-500/20 text-green-400' 
+                : 'bg-red-500/20 text-red-400'
+            }`}>
+              {isConnected ? (
+                <>
+                  <Wifi className="w-4 h-4" />
+                  <span className="text-sm font-medium">Live</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="w-4 h-4" />
+                  <span className="text-sm font-medium">Offline</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {mockStocks.map((stock) => (
-            <StockCard
-              key={stock.id}
-              stock={stock}
-              isExpanded={expandedId === stock.id}
-              onClick={() => handleCardClick(stock.id)}
-            />
-          ))}
+        {/* Tab Navigation */}
+        <div className="mb-6 flex gap-2 border-b border-slate-700">
+          <button
+            onClick={() => setActiveTab('stocks')}
+            className={`px-6 py-3 font-semibold transition-all duration-200 relative ${
+              activeTab === 'stocks'
+                ? 'text-cyan-400'
+                : 'text-slate-400 hover:text-slate-300'
+            }`}
+          >
+            Stock Cards
+            {activeTab === 'stocks' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('nifty')}
+            className={`px-6 py-3 font-semibold transition-all duration-200 relative ${
+              activeTab === 'nifty'
+                ? 'text-cyan-400'
+                : 'text-slate-400 hover:text-slate-300'
+            }`}
+          >
+            NIFTY
+            {activeTab === 'nifty' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('banknifty')}
+            className={`px-6 py-3 font-semibold transition-all duration-200 relative ${
+              activeTab === 'banknifty'
+                ? 'text-cyan-400'
+                : 'text-slate-400 hover:text-slate-300'
+            }`}
+          >
+            Bank Nifty
+            {activeTab === 'banknifty' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('indices')}
+            className={`px-6 py-3 font-semibold transition-all duration-200 relative ${
+              activeTab === 'indices'
+                ? 'text-cyan-400'
+                : 'text-slate-400 hover:text-slate-300'
+            }`}
+          >
+            Index Cards (Old)
+            {activeTab === 'indices' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('test')}
+            className={`px-6 py-3 font-semibold transition-all duration-200 relative ${
+              activeTab === 'test'
+                ? 'text-cyan-400'
+                : 'text-slate-400 hover:text-slate-300'
+            }`}
+          >
+            Test (Old)
+            {activeTab === 'test' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
+            )}
+          </button>
         </div>
+
+        {/* Tab Content */}
+        {activeTab === 'stocks' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mockStocks.map((stock) => (
+              <StockCard
+                key={stock.id}
+                stock={stock}
+                isExpanded={expandedId === stock.id}
+                onClick={() => handleCardClick(stock.id)}
+              />
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'nifty' && (
+          <div className="max-w-full">
+            {symbolsData.NIFTY ? (
+              <SymbolCard indexData={symbolsData.NIFTY} symbol="NIFTY" />
+            ) : (
+              <div className="text-center text-slate-400 py-10">Loading NIFTY Data...</div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'banknifty' && (
+          <div className="max-w-full">
+            {symbolsData.BANKNIFTY ? (
+              <SymbolCard indexData={symbolsData.BANKNIFTY} symbol="BANKNIFTY" />
+            ) : (
+              <div className="text-center text-slate-400 py-10">Loading Bank Nifty Data...</div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'indices' && (
+          <div className="max-w-full">
+            {symbolsData.NIFTY ? (
+              <IndexCard indexData={symbolsData.NIFTY} />
+            ) : (
+              <div className="text-center text-slate-400 py-10">Loading Index Data...</div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'test' && (
+          <div className="max-w-full">
+            {symbolsData.NIFTY ? (
+              <TestIndexCard indexData={symbolsData.NIFTY} />
+            ) : (
+              <div className="text-center text-slate-400 py-10">Loading Test Data...</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
