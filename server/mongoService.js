@@ -251,6 +251,42 @@ export const getSymbolData = async (symbol = 'NIFTY') => {
 export const getNiftyData = async () => getSymbolData('NIFTY');
 
 /**
+ * Get all stocks data from Stocks database
+ * @param {Array<string>} symbols - Array of stock symbols to fetch
+ * @returns {Promise<Array<Object>>} Array of stock documents
+ */
+export const getAllStocks = async (symbols) => {
+  try {
+    const STOCKS_DB_NAME = process.env.STOCKS_DB_NAME;
+    const STOCKS_COLLECTION = process.env.STOCKS_COLLECTION;
+    
+    // Connect to MongoDB if not already connected
+    if (!client || !client.topology || !client.topology.isConnected()) {
+      client = new MongoClient(MONGO_URI);
+      await client.connect();
+      console.log(`[MongoDB] Connected for Stocks data`);
+    }
+    
+    // Access Stocks database and collection
+    const stocksDb = client.db(STOCKS_DB_NAME);
+    const stocksCollection = stocksDb.collection(STOCKS_COLLECTION);
+    
+    // Fetch all stocks matching the symbols array
+    const stocks = await stocksCollection.find({
+      symbol: { $in: symbols }
+    }).toArray();
+    
+    console.log(`[MongoDB] Fetched ${stocks.length} stocks from ${STOCKS_DB_NAME}.${STOCKS_COLLECTION}`);
+    return stocks;
+    
+  } catch (error) {
+    console.error(`[MongoDB] Error fetching stocks:`, error.message);
+    return [];
+  }
+};
+
+
+/**
  * Close MongoDB connection
  */
 export const closeMongo = async () => {

@@ -2,7 +2,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { getExtraOptions, connectMongo } from './mongoService.js';
+import { getExtraOptions, getAllStocks, connectMongo } from './mongoService.js';
+import fs from 'fs/promises';
 
 dotenv.config();
 
@@ -51,6 +52,33 @@ app.get('/api/extra-options', async (req, res) => {
   }
 });
 
+// Get all stocks endpoint
+app.get('/api/stocks', async (req, res) => {
+  try {
+    // Read stocks list from stocks.txt
+    const stocksFile = await fs.readFile('./stocks.txt', 'utf-8');
+    const symbols = stocksFile.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
+    console.log(`[MongoDB Server] Fetching ${symbols.length} stocks`);
+    
+    const stocks = await getAllStocks(symbols);
+    
+    res.json({
+      status: 'success',
+      count: stocks.length,
+      data: stocks
+    });
+  } catch (error) {
+    console.error('[MongoDB Server] Error fetching stocks:', error.message);
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+});
+
 // Start server
 const startServer = async () => {
   try {
@@ -63,7 +91,8 @@ const startServer = async () => {
       console.log(`[MongoDB Server] Running on http://localhost:${PORT}`);
       console.log('[MongoDB Server] Endpoints:');
       console.log(`  - GET /api/health`);
-      console.log(`  - GET /api/extra-options?currentPrice=26000`);
+      console.log(`  - GET /api/extra-options?symbol=NIFTY&currentPrice=26000`);
+      console.log(`  - GET /api/stocks`);
     });
   } catch (error) {
     console.error('[MongoDB Server] Failed to start:', error.message);

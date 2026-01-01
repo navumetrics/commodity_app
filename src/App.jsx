@@ -3,7 +3,8 @@ import { StockCard } from './components/StockCard';
 import { IndexCard } from './components/IndexCard';
 import { TestIndexCard } from './components/TestIndexCard';
 import { SymbolCard } from './components/SymbolCard';
-import { Wifi, WifiOff } from 'lucide-react';
+import { SimpleStockCard } from './components/SimpleStockCard';
+import { Wifi, WifiOff, Search, X } from 'lucide-react';
 import marketDataService from './services/marketDataService';
 
 console.log('🚀 [App.jsx] Module loaded!');
@@ -157,9 +158,13 @@ const mockStocks = [
 
 export default function App() {
   const [expandedId, setExpandedId] = useState(null);
-  const [activeTab, setActiveTab] = useState('nifty'); // 'stocks', 'indices', 'test', 'nifty', 'banknifty'
+  const [activeTab, setActiveTab] = useState('nifty'); // 'stocks', 'indices', 'test', 'nifty', 'banknifty', or stock symbol
   const [isConnected, setIsConnected] = useState(false);
-  const [symbolsData, setSymbolsData] = useState({}); // { NIFTY: {...}, BANKNIFTY: {...} }
+  const [symbolsData, setSymbolsData] = useState({}); // { NIFTY: {...}, BANKNIFTY: {...}, ABB: {...} }
+  const [stocks, setStocks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingStocks, setIsLoadingStocks] = useState(false);
+  const [openedStockTabs, setOpenedStockTabs] = useState([]); // Array of stock symbols with open tabs
 
   // Connect to WebSocket on mount
   useEffect(() => {
@@ -186,6 +191,51 @@ export default function App() {
       marketDataService.disconnect();
     };
   }, []);
+
+  // Fetch stocks data
+  useEffect(() => {
+    const fetchStocks = async () => {
+      setIsLoadingStocks(true);
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+        const response = await fetch(`${API_URL}/api/stocks`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          setStocks(data.data);
+          console.log(`[App] Loaded ${data.count} stocks`);
+        }
+      } catch (error) {
+        console.error('[App] Error fetching stocks:', error);
+      } finally {
+        setIsLoadingStocks(false);
+      }
+    };
+
+    fetchStocks();
+  }, []);
+
+  // Filter stocks based on search query
+  const filteredStocks = stocks.filter(stock =>
+    stock.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Open a stock tab
+  const openStockTab = (stockSymbol) => {
+    if (!openedStockTabs.includes(stockSymbol)) {
+      setOpenedStockTabs(prev => [...prev, stockSymbol]);
+    }
+    setActiveTab(stockSymbol);
+  };
+
+  // Close a stock tab
+  const closeStockTab = (stockSymbol) => {
+    setOpenedStockTabs(prev => prev.filter(s => s !== stockSymbol));
+    // If closing the active tab, switch to stocks tab
+    if (activeTab === stockSymbol) {
+      setActiveTab('stocks');
+    }
+  };
 
   const handleCardClick = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -286,19 +336,78 @@ export default function App() {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
             )}
           </button>
+
+          {/* Dynamic Stock Tabs */}
+          {openedStockTabs.map((stockSymbol) => (
+            <button
+              key={stockSymbol}
+              onClick={() => setActiveTab(stockSymbol)}
+              className={`px-6 py-3 font-semibold transition-all duration-200 relative flex items-center gap-2 ${
+                activeTab === stockSymbol
+                  ? 'text-cyan-400'
+                  : 'text-slate-400 hover:text-slate-300'
+              }`}
+            >
+              {stockSymbol}
+              {activeTab === stockSymbol && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"></div>
+              )}
+              {/* Close button */}
+              <X
+                className="w-4 h-4 hover:text-red-400 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeStockTab(stockSymbol);
+                }}
+              />
+            </button>
+          ))}
         </div>
 
         {/* Tab Content */}
         {activeTab === 'stocks' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockStocks.map((stock) => (
-              <StockCard
-                key={stock.id}
-                stock={stock}
-                isExpanded={expandedId === stock.id}
-                onClick={() => handleCardClick(stock.id)}
-              />
-            ))}
+          <div>
+            {/* Search Box */}
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search stocks..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                />
+              </div>
+              <div className="mt-2 text-sm text-slate-400">
+                Showing {filteredStocks.length} of {stocks.length} stocks
+              </div>
+            </div>
+
+            {/* Loading State */}
+            {isLoadingStocks && (
+              <div className="text-center text-slate-400 py-10">Loading stocks...</div>
+            )}
+
+            {/* Stock Cards Grid */}
+            {!isLoadingStocks && filteredStocks.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredStocks.map((stock) => (
+                  <SimpleStockCard 
+                    key={stock.symbol} 
+                    stock={stock} 
+                    onClick={() => openStockTab(stock.symbol)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* No Results */}
+            {!isLoadingStocks && filteredStocks.length === 0 && stocks.length > 0 && (
+              <div className="text-center text-slate-400 py-10">
+                No stocks found matching "{searchQuery}"
+              </div>
+            )}
           </div>
         )}
 
@@ -341,6 +450,20 @@ export default function App() {
             )}
           </div>
         )}
+
+        {/* Dynamic Stock Tabs Content */}
+        {openedStockTabs.includes(activeTab) && (() => {
+          const stockData = stocks.find(s => s.symbol === activeTab);
+          return (
+            <div className="max-w-full">
+              {stockData ? (
+                <SymbolCard indexData={stockData} symbol={activeTab} />
+              ) : (
+                <div className="text-center text-slate-400 py-10">Loading {activeTab} Data...</div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
